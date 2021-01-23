@@ -20,35 +20,38 @@
                     params[type].push(value);
                 });
                 console.log(params);
-                let baseQuery =
-                    "PREFIX dct: <http://purl.org/dc/terms/> \n" +
+                let query = "PREFIX dct: <http://purl.org/dc/terms/> \n" +
                     "PREFIX dcat: <http://www.w3.org/ns/dcat#> \n\n" +
                     "SELECT DISTINCT ?contributorID ?dataset ?title WHERE { \n" +
                     "  ?dataset a dcat:Dataset . \n" +
                     "  ?dataset dct:title ?title . \n" +
                     "  ?dataset ?contributorIDpredicate ?contributorID . \n" +
                     "  FILTER(REGEX(STR(?contributorIDpredicate), 'contributorID', 'i')) . \n";
-                let sparqlOutput = baseQuery;
 
                 // keywords
                 if (params.tags) {
-                    sparqlOutput +=
+                    query +=
                         "  ?dataset dcat:keyword ?keyword . \n" +
                         "  FILTER(?keyword IN(";
-                    params.tags.forEach(keyword => sparqlOutput += "'" + keyword + "', ");
-                    sparqlOutput = sparqlOutput.slice(0, -2) + ")) . \n";
+                    params.tags.forEach(keyword => query += "'" + keyword + "', ");
+                    query = query.slice(0, -2) + ")) . \n";
                 }
 
                 // categories
                 if (params.groups) {
-                    // TODO
+                    query = "PREFIX theme: <http://publications.europa.eu/resource/authority/data-theme/> \n" + query;
+                    query +=
+                        "  ?dataset dcat:theme ?theme . \n" +
+                        "  FILTER(?theme IN(";
+                    params.groups.forEach(group => query += "theme:" + group.toUpperCase() + ", ");
+                    query = query.slice(0, -2) + ")) . \n";
                 }
 
-                sparqlOutput += "}";
+                query += "}";
                 document.getElementById('resultElements').style.display = 'block';
-                let baseSparqlURL = 'https://www.govdata.de/web/guest/sparql-assistent#query=';
-                document.getElementById('sparqlAssistantLink').href = baseSparqlURL + encodeURIComponent(sparqlOutput);
-                document.getElementById('sparqlOutput').value = sparqlOutput;
+                document.getElementById('sparqlOutput').value = query;
+                document.getElementById('sparqlAssistantLink').href =
+                    'https://www.govdata.de/web/guest/sparql-assistent#query=' + encodeURIComponent(query);
             }
         </script>
         <br/>
@@ -58,12 +61,12 @@
         <br/><br/>
         <input type="button" value="Convert" onclick="convert()">
         <div id="resultElements" style="display:none">
-            <br/><br/>
+            <br/>
             <label for="sparqlOutput"><b>Matching SPARQL query</b></label>
             <br/>
-            <textarea id="sparqlOutput" rows="12" cols="80"></textarea>
+            <textarea id="sparqlOutput" rows="14" cols="80"></textarea>
             <br/><br/>
-            <b><a id="sparqlAssistantLink" href="#">Link to SPARQL-Assistent</a></b>
+            <b><a id="sparqlAssistantLink" href="#">Link to GovData SPARQL-Assistant</a></b>
         </div>
     </body>
 </html>
