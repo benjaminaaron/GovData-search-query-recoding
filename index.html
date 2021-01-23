@@ -20,18 +20,32 @@
                     params[type].push(value);
                 });
                 console.log(params);
-                // TODO
+                let baseQuery =
+                    "PREFIX dct: <http://purl.org/dc/terms/> \n" +
+                    "PREFIX dcat: <http://www.w3.org/ns/dcat#> \n\n" +
+                    "SELECT DISTINCT ?contributorID ?dataset ?title WHERE { \n" +
+                    "  ?dataset a dcat:Dataset . \n" +
+                    "  ?dataset dct:title ?title . \n" +
+                    "  ?dataset ?contributorIDpredicate ?contributorID . \n" +
+                    "  FILTER(REGEX(STR(?contributorIDpredicate), 'contributorID', 'i')) . \n" +
+                    "} ";
+                let baseSparqlURL = 'https://www.govdata.de/web/guest/sparql-assistent#query=';
+                let sparqlOutput = baseQuery; // TODO
+                document.getElementById('sparqlAssistantLink').href = baseSparqlURL + encodeURIComponent(sparqlOutput);
+                document.getElementById('sparqlOutput').value = sparqlOutput;
             }
         </script>
         <br/>
         <label for="urlInput"><b>URL with search parameters encoded</b></label>
         <br/>
-        <textarea id="urlInput" rows="4" cols="50"></textarea>
+        <textarea id="urlInput" rows="4" cols="80"></textarea>
         <br/><br/>
         <input type="button" value="Convert" onclick="convert()">
         <br/><br/>
         <label for="sparqlOutput"><b>Matching SPARQL query</b></label>
         <br/>
-        <textarea id="sparqlOutput" rows="12" cols="50"></textarea>
+        <textarea id="sparqlOutput" rows="12" cols="80"></textarea>
+        <br/><br/>
+        <b><a id="sparqlAssistantLink" href="#">Link to SPARQL-Assistent</a></b>
     </body>
 </html>
