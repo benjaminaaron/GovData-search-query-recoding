@@ -8,8 +8,19 @@
     <body>
         <script>
             function convert() {
-                let urlInput = document.getElementById('urlInput').value;
-                console.log(urlInput);
+                let urlInput = decodeURIComponent(document.getElementById('urlInput').value);
+                let params = {};
+                let paramsStr = urlInput.split('/')[9].slice(0, -1);
+                paramsStr.split(',').map(pStr => {
+                    let type = pStr.split(':')[0];
+                    let value = pStr.split(':')[1];
+                    if (!params[type]) {
+                        params[type] = [];
+                    }
+                    params[type].push(value);
+                });
+                console.log(params);
+                // TODO
             }
         </script>
         <br/>
